@@ -19,22 +19,21 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "Subset Tunneling and Resilience Concept for BIER-TE"
+abbrev: "STARC"
 category: info
 
-docname: draft-todo-yourname-protocol-latest
+docname: draft-fluechter-bier-bierte-subset-tunneling-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: "Routing"
+workgroup: "Bit Indexed Explicit Replication"
 keyword:
- - next generation
- - unicorn
- - sparkling distributed ledger
+ - multicast
+ - resilience
 venue:
   group: WG
   type: Working Group
