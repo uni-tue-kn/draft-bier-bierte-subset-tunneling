@@ -15,12 +15,12 @@ keyword:
  - multicast
  - resilience
 venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: USER/REPO
-  latest: https://example.com/LATEST
+  group: "Bit Indexed Explicit Replication"
+  type: "Working Group"
+  mail: "bier@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/bier/"
+  github: "uni-tue-kn/draft-bier-bierte-subset-tunneling"
+  latest: "https://uni-tue-kn.github.io/draft-bier-bierte-subset-tunneling/draft-fluechter-bier-bierte-subset-tunneling.html"
 
 author:
  -
