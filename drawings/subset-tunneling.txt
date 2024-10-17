@@ -1,0 +1,9 @@
+|                    BIER-TE domain                            |
+                            |    BIER-TE subset (SI:1)         |
+                                             /───1─── BFER 1
+                                            /         
+                                           / 
+BFIR ───A─── LSR ───B─── S-BFIR A ───0─── BFR A ───2─── BFER 2
+                                           \
+                                            \
+                                             \───3─── BFER 3

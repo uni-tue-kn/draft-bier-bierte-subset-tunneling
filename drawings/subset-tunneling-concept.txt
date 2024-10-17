@@ -1,0 +1,3 @@
+|                    BIER-TE domain                   |
+                            |    BIER-TE subset       |
+BFIR ───A─── LSR ───B─── S-BFIR ───0─── BFR ───2─── BFER
