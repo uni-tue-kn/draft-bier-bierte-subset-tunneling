@@ -1,0 +1,429 @@
+
+
+
+
+Bit Indexed Explicit Replication                             M. Flüchter
+Internet-Draft                                                  M. Menth
+Intended status: Informational                   University of Tuebingen
+Expires: 20 April 2025                                         T. Eckert
+                                                           Futurewei USA
+                                                         17 October 2024
+
+
+   Extensions to BIER Tree Engineering (BIER-TE) for Large Multicast
+                       Domains and 1:1 Protection
+          draft-fluechter-bier-bierte-subset-tunneling-latest
+
+Abstract
+
+   BIER-TE extends BIER with tree engineering capabilities and can be
+   supported by almost the same hardware.  However, a bitstring in BIER-
+   TE hold bits for BFERs and links, which effects that the size of
+   supportable networks in terms of BFERs is smaller for BIER-TE than
+   for BIER.  While for BIER, subsets can be utilized to improve scaling
+   to large multicast domains, this mechanism requires adaptation for
+   BIER-TE.  In this document, requirements for BIER-TE subsets are
+   defined, a mechanism is described for how BIER-TE packets can reach
+   their subsets using tunneling, and 1:1 protection for the entire
+   BIER-TE multicast tree is explained.  The concept utilizes egress
+   protection for reaching a subset when the ingress BFIR of the subset
+   fails.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at https://uni-tue-
+   kn.github.io/draft-bier-bierte-subset-tunneling/draft-fluechter-bier-
+   bierte-subset-tunneling.html.  Status information for this document
+   may be found at https://datatracker.ietf.org/doc/draft-fluechter-
+   bier-bierte-subset-tunneling/.
+
+   Discussion of this document takes place on the Bit Indexed Explicit
+   Replication Working Group mailing list (mailto:bier@ietf.org), which
+   is archived at https://mailarchive.ietf.org/arch/browse/bier/.
+   Subscribe at https://www.ietf.org/mailman/listinfo/bier/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/uni-tue-kn/draft-bier-bierte-subset-tunneling.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 20 April 2025.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+     1.1.  Terminology
+       1.1.1.  Abbreviations
+   2.  BIER-TE Subsets
+     2.1.  Limitation of current BIER-TE subsets
+     2.2.  Proposed BIER-TE Subset Concept
+     2.3.  Subset Selection Constraints
+   3.  Subset Tunneling
+   4.  1:1 Protection
+     4.1.  Intra-Subset Protection
+     4.2.  Subset Ingress Protection
+     4.3.  Subset Tunneling Protection
+   5.  Examples
+     5.1.  Subset Tunneling
+     5.2.  Ingress Protection with MPLS Tunneling
+   6.  Security Considerations
+   7.  IANA Considerations
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
+   Authors' Addresses
+
+1.  Introduction
+
+   Bit Index Explicit Replication with Traffic Engineering (BIER-TE) was
+   introduced in [RFC9262] as an alternative to BIER multicast, offering
+   enhanced capabilities through traffic engineering, or "tree
+   engineering" in this context.  In BIER-TE, the forwarding of
+   multicast traffic is guided by the BIER-TE header that includes bits
+   representing Bit Forwarding Egress Routers (BFERs) and network links.
+   As a result, the entire multicast distribution tree is encoded
+   directly within the packet header.  However, this encoding leads to
+   scalability challenges, particularly in large network domains which
+   are similar as in BIER.  The size of the BIER-TE domain is
+   constrained by the maximum possible header length, limiting the
+   usability of BIER-TE in large multicast domains.
+
+   BIER-TE inherits the concept of subsets from BIER where the network
+   domain can be partitioned into smaller segments.  A BIER-TE subset is
+   a partition of the BIER-TE domain with a unique Set Identifier (SI).
+   The SI containing the destination BFERs of a packet is indicated in
+   the BIER-TE header as a bitstring.  Further, the bitstring addresses
+   only links and BFERs in that subset.
+
+   In this document, requirements for BIER-TE subsets are defined, a
+   mechanism is described for how BIER-TE packets can reach their
+   subsets using tunneling.  Further the application of 1:1 protection
+   for the entire multicast tree is explained.  With these extensions,
+   BIER-TE can scale to large multicast domains.  The extensions depend
+   on well established technologies and do not require any changes to
+   the BIER header or forwarding logic.
+
+1.1.  Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+1.1.1.  Abbreviations
+
+   This document makes use of the terms defined in [RFC9262] and in
+   [RFC8679].
+
+   Further abbreviations used in this document:
+
+    +==============+======================================+===========+
+    | Abbreviation | Meaning                              | Reference |
+    +==============+======================================+===========+
+    | S-BFIR       | Subset Bit Forwarding Ingress Router | This      |
+    |              |                                      | document  |
+    +--------------+--------------------------------------+-----------+
+
+                          Table 1: Abbreviations.
+
+2.  BIER-TE Subsets
+
+   In this section, limitations of the current BIER-TE subset definition
+   are described.  Based on these shortcomings, a new BIER-TE subset
+   concept is proposed.
+
+2.1.  Limitation of current BIER-TE subsets
+
+   BIER-TE packets can only be forwarded over links that are in the same
+   subset as the destination BFERs.  Therefore, all links of the
+   multicast tree from BFIR to BFERs have to be in the same subset.
+   This is further referred to as 1-connectedness of a subset, meaning
+   that any forwarding node in the subset has at least one path to any
+   other node in the subset.  The BFIR is also regarded as a part of the
+   subset for 1-connectedness.
+
+   For 1:1 protection and tree engineering more than one path between
+   two nodes is needed.  When a node or link fails, the remaining subset
+   has to still be 1-connected.  Therefore, a BIER-TE subset has to be
+   at least 2-connected, meaning that there are at least two paths
+   between any two forwarding nodes.
+
+   This constraint is hard to fulfill in large multicast domains due to
+   limitations of the maximum size of the BIER-TE bitstring.  It is not
+   necessarily possible to select 2-connected subsets in a large
+   multicast domain that are sufficiently small.
+
+2.2.  Proposed BIER-TE Subset Concept
+
+   Smaller BIER-TE subsets are only possible if the BFIR does not have
+   to be directly connected to a BIER-TE subset.  Rather, only the BFERs
+   in a subset have to be 2-connected with each other.  This also
+   requires a new way with which the BFIR can forward packets to a
+   subset as it cannot reach them with native BIER-TE anymore.  This
+   draft introduces Subset BFIRs (S-BFIR) which are assigned to each
+   subset.  The S-BFIRs serve as ingress node into the subset and as
+   tunneling endpoint for the BFIR.  The BFIR distributes packets to the
+   subsetws by tunneling a packet to the corresponding S-BFIRs.
+
+2.3.  Subset Selection Constraints
+
+   For the selection of such a BIER-TE subset, the following constraints
+   MUST be fulfilled:
+
+   *  Maximum BitStringLength: A subset cannot be larger than the
+      maximum supported BitStringLength in the domain.
+
+   *  2-connectedness: To leverage BIER-TE FRR as defined in
+      [I-D.draft-eckert-bier-te-frr] the subset has to be at least
+      2-connected.
+
+   *  Backup ingresses: For 1:1 protection, a subset MUST have at least
+      two S-BFIRs.  Each serves as a backup S-BFIR if the other fails.
+
+   *  Virtual links: 2-connectedness may still not be possible for a
+      subset in, e.g., a ring ropology.  Therefore, additional virtual
+      links can be assigned between two nodes via a BIER-TE routed
+      connection.
+
+3.  Subset Tunneling
+
+   The BFIR reaches each subset by tunneling packets to the
+   corresponding S-BFIR.  To that end, the BFIR forwarding logic has to
+   be slightly modified from the one defined in [RFC8279].  When a BFIR
+   receives an IPMC packet, it determines the destination BFERs and
+   their subsets as with standard BIER-TE.  The BFIR clones the packet
+   for each subset and adds the corresponding BIER-TE header to each
+   packet.  The BIER-TE bitstring contains the multicast tree from
+   S-BFIR to the BFERs in the same subset and is computed by the BIER-TE
+   controller.  Then, the BFIR adds an outer tunneling header that
+   reaches one of the S-BFIRs of the destination subset.  When an S-BFIR
+   receives such a tunneled packet, it removes the tunnel header and
+   applies BIER-TE forwarding.  Used tunneling protocols SHOULD support
+   traffic engineering, e.g., MPLS TE or SRv6.  Further, they SHOULD
+   support FRR and egress protection mechanisms for 1:1 protection.
+
+4.  1:1 Protection
+
+   The protection of BIER-TE with subsets is split into three sections:
+   within the subset, at the subset ingress and during tunneling.
+
+4.1.  Intra-Subset Protection
+
+   Protection against failure inside a subset is achieved with existing
+   BIER-TE FRR mechanisms.  There are currently two drafts for BIER-TE
+   FRR [I-D.draft-eckert-bier-te-frr] and [I-D.draft-chen-bier-te-frr].
+   Both define mechanisms for link and node protection and propose BIER-
+   TE-in-BIER-TE tunneling to reroute packets around a failure.
+   Therefore, either of these drafts may be used for the FRR protection
+   mechanisms.
+
+4.2.  Subset Ingress Protection
+
+   When an S-BFIR fails, the packet has to be rerouted to a backup
+   S-BFIR.  To protect against this failure, the tunneling protocol must
+   support an egress protection mechanism.  If MPLS is used for the
+   tunnel, then the MPLS Egress Protection Framework [RFC8679] can be
+   used.  For SRv6 egress protection there is a similar draft
+   [I-D.draft-ietf-rtgwg-srv6-egress-protection].
+
+   When the penultimate tunneling hop detects the failure of the S-BFIR,
+   it becomes the PLR.  On a detected failure, the PLR determines a
+   backup S-BFIR of the same subset.  If there are multiple backup
+   S-BFIR, the PLR may select a backup S-BFIR based on different
+   criteria, e.g., the closest backup S-BFIR.  The PLR uses the egress
+   protection mechanism of the tunneling protocol to reroute the packet
+   to the backup S-BFIR.
+
+   The backup S-BFIR recognizes its role as backup ingress based on the
+   tunneling protocol header.  It removes the tunneling header and
+   applies BIER-TE FRR with node protection.  This ensures that the
+   packet is forwarded to the correct next hops of the failed S-BFIR.
+   It also modifies the BIER-TE bitstring to prevent loops in the
+   subset.  After the backup S-BFIR processing, standard BIER-TE
+   forwarding is applied.
+
+4.3.  Subset Tunneling Protection
+
+   The tunnel between BFIR and S-BFIR may be protected using existing
+   FRR 1:1 protection mechanisms.  RSVP-TE with FRR [RFC8796] can be
+   used for MPLS and [I-D.draft-ietf-rtgwg-segment-routing-ti-lfa] for
+   FRR protection in SRv6.
+
+5.  Examples
+
+   In this section, we present two exemplary scenarios.  One for the
+   subset tunneling and one for the ingress protection mechanism.
+
+5.1.  Subset Tunneling
+
+   An example topology using BIER-TE subset tunneling is illustrated in
+   Figure 1.  The BFIR determines that the packet needs to be delivered
+   to BFERs 1 and 2.  It recognizes that the two BFERs lie within two
+   different subsets and clones the packet.  The first packet receives a
+   BIER-TE header with the bits set for link 0 and BFER 1 and is
+   tunneled to the S-BFIR of subset 1.  The second packet recieves a
+   BIER-TE header with the bits set for link 1 and BFER 2 and is
+   tunneled to subset 2.  When the packet arrives at each S-BFIR, the
+   S-BFIR removes the MPLS tunnel header.  For subset 1, it then matches
+   the BIER bitstring and forwards the packet over link 0.  The S-BFIR
+   of subset to forwards the packet over link 1.
+
+                               BFIR
+                                 |
+                                 A
+                   SI:1          |           SI:2
+                  S-BFIR ───B── LSR ───C─── S-BFIR
+                    |                         |   \
+                    0                         1    2
+                    |                         |     \
+                   BFER 1                  BFER 2   BFER 3
+
+      Figure 1: Example BIER-TE network with two subsets and S-BFIRs.
+
+5.2.  Ingress Protection with MPLS Tunneling
+
+   Figure 2 illustrates the concept of ingress protection with MPLS.
+   When the tunneled BIER-TE packet arrives at the LSR B, it detects
+   that S-BFIR A failed.  Using MPLS egress protection, the PLR (LSR B)
+   switches the label to the context label C' which indicates the backup
+   path to S-BFIR'.  S-BFIR' recognizes its role as protector by
+   matching the context label to the failed ingress node.  Then, it
+   applies the BIER-TE FRR node protection handling, unsets the bit for
+   link 1 and sets the bit for link 0.  This way, the packet reaches the
+   BFR and can be forwarded with standard BIER-TE.
+
+   |                    BIER-TE domain                            |
+                                           | BIER-TE subset (SI:1)|
+                                  /--C'-- S-BFIR' -- 0 -- \
+                                 /                          \
+                                /                            \
+   BFIR ───A─── LSR A ───B─── LSR B  ───C─── S-BFIR ───1─── BFR
+                              (PLR)
+
+       Figure 2: Example BIER-TE network with a single subset and two
+                                  S-BFIRs.
+
+6.  Security Considerations
+
+   The security issues discussed in [RFC8279], [RFC9262], and [RFC8679]
+   apply to this document.
+
+7.  IANA Considerations
+
+   This document has no IANA actions.
+
+8.  References
+
+8.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8279]  Wijnands, IJ., Ed., Rosen, E., Ed., Dolganow, A.,
+              Przygienda, T., and S. Aldrin, "Multicast Using Bit Index
+              Explicit Replication (BIER)", RFC 8279,
+              DOI 10.17487/RFC8279, November 2017,
+              <https://www.rfc-editor.org/rfc/rfc8279>.
+
+   [RFC9262]  Eckert, T., Ed., Menth, M., and G. Cauchie, "Tree
+              Engineering for Bit Index Explicit Replication (BIER-TE)",
+              RFC 9262, DOI 10.17487/RFC9262, October 2022,
+              <https://www.rfc-editor.org/rfc/rfc9262>.
+
+8.2.  Informative References
+
+   [I-D.draft-chen-bier-te-frr]
+              Chen, H., McBride, M., Liu, Y., Wang, A., Mishra, G. S.,
+              Fan, Y., Liu, L., and X. Liu, "BIER-TE Fast ReRoute", Work
+              in Progress, Internet-Draft, draft-chen-bier-te-frr-07, 28
+              March 2024, <https://datatracker.ietf.org/doc/html/draft-
+              chen-bier-te-frr-07>.
+
+   [I-D.draft-eckert-bier-te-frr]
+              Eckert, T. T., Cauchie, G., Braun, W., and M. Menth,
+              "Protection Methods for BIER-TE", Work in Progress,
+              Internet-Draft, draft-eckert-bier-te-frr-03, 5 March 2018,
+              <https://datatracker.ietf.org/doc/html/draft-eckert-bier-
+              te-frr-03>.
+
+   [I-D.draft-ietf-rtgwg-segment-routing-ti-lfa]
+              Bashandy, A., Litkowski, S., Filsfils, C., Francois, P.,
+              Decraene, B., and D. Voyer, "Topology Independent Fast
+              Reroute using Segment Routing", Work in Progress,
+              Internet-Draft, draft-ietf-rtgwg-segment-routing-ti-lfa-
+              17, 5 July 2024, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-rtgwg-segment-routing-ti-lfa-17>.
+
+   [I-D.draft-ietf-rtgwg-srv6-egress-protection]
+              Hu, Z., Chen, H., Toy, M., Cao, C., and T. He, "SRv6 Path
+              Egress Protection", Work in Progress, Internet-Draft,
+              draft-ietf-rtgwg-srv6-egress-protection-16, 1 February
+              2024, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              rtgwg-srv6-egress-protection-16>.
+
+   [RFC8679]  Shen, Y., Jeganathan, M., Decraene, B., Gredler, H.,
+              Michel, C., and H. Chen, "MPLS Egress Protection
+              Framework", RFC 8679, DOI 10.17487/RFC8679, December 2019,
+              <https://www.rfc-editor.org/rfc/rfc8679>.
+
+   [RFC8796]  Taillon, M., Saad, T., Ed., Gandhi, R., Deshmukh, A.,
+              Jork, M., and V. Beeram, "RSVP-TE Summary Fast Reroute
+              Extensions for Label Switched Path (LSP) Tunnels",
+              RFC 8796, DOI 10.17487/RFC8796, July 2020,
+              <https://www.rfc-editor.org/rfc/rfc8796>.
+
+Authors' Addresses
+
+   Moritz Flüchter
+   University of Tuebingen
+   Tuebingen
+   Germany
+   Email: moritz.fluechter@uni-tuebingen.de
+
+
+   Michael Menth
+   University of Tuebingen
+   Tuebingen
+   Germany
+   Email: michael.menth@uni-tuebingen.de
+
+
+   Toerless Eckert
+   Futurewei USA
+   Email: tte@cs.fau.de
