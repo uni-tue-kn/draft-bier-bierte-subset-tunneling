@@ -1,3 +1,7 @@
-|                    BIER-TE domain                   |
-                            |    BIER-TE subset       |
-BFIR ───A─── LSR ───B─── S-BFIR ───0─── BFR ───2─── BFER
+|       MPLS Tunnel         |     BIER-TE Subset      |
+|                           |                         |
+BFIR ───A─── LSR ───B─── S-BFIR ───0─── BFR ───1─── BFER
+                                         |
+                                         2
+                                         |
+                                        BFR ───3─── BFER                   

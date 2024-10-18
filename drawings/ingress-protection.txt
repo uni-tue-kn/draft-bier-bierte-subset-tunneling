@@ -1,7 +1,7 @@
 |                    BIER-TE domain                            |
                                         | BIER-TE subset (SI:1)|
                                /--C'-- S-BFIR' -- 0 -- \
-                              /                          \
-                             /                            \
+                              /                         \
+                             /                           \
 BFIR ───A─── LSR A ───B─── LSR B  ───C─── S-BFIR ───1─── BFR
                            (PLR)

@@ -124,18 +124,23 @@ When a BFIR receives an IPMC packet, it determines the destination BFERs and the
 The BFIR clones the packet for each subset and adds the corresponding BIER-TE header to each packet.
 The BIER-TE bitstring contains the multicast tree from S-BFIR to the BFERs in the same subset.
 Then, the BFIR adds an outer tunneling header that reaches one of the S-BFIRs of the destination subset.
+
+~~~~
+{::include ./drawings/subset-tunneling-concept.txt}
+~~~~
+{: #fig-subset-tunneling-concept title="Example BIER-TE network with a one-connected BIER-TE subset, S-BFIR, and MPLS tunnel."}
+
 When an S-BFIR receives such a tunneled packet, it removes the tunnel header and applies BIER-TE forwarding.
 Used tunneling protocols SHOULD support traffic engineering, e.g., MPLS TE or SRv6.
 Further, they SHOULD support FRR and egress protection mechanisms for 1:1 protection.
 
-# 1:1 Protection
-The protection of BIER-TE with subsets is split into three sections: within the subset, at the subset ingress and during tunneling.
 
-## Intra-Subset Protection
-Protection against failure inside a subset is achieved with existing BIER-TE FRR mechanisms.
-There are currently two drafts for BIER-TE FRR {{?I-D.draft-eckert-bier-te-frr}} and {{?I-D.draft-chen-bier-te-frr}}.
-Both define mechanisms for link and node protection and propose BIER-TE-in-BIER-TE tunneling to reroute packets around a failure.
-Therefore, either of these drafts may be used for the FRR protection mechanisms.
+# 1:1 Protection
+The protection of BIER-TE with subsets is split into three sections: during tunneling, at the subset ingress, and within the subset.
+
+## Subset Tunneling Protection
+The tunnel between BFIR and S-BFIR may be protected using existing FRR 1:1 protection mechanisms.
+RSVP-TE with FRR {{?RFC8796}} can be used for MPLS and {{?I-D.draft-ietf-rtgwg-segment-routing-ti-lfa}} for FRR protection in SRv6.
 
 ## Subset Ingress Protection
 When an S-BFIR fails, the packet has to be rerouted to a backup S-BFIR.
@@ -148,15 +153,26 @@ On a detected failure, the PLR determines a backup S-BFIR of the same subset.
 If there are multiple backup S-BFIR, the PLR may select a backup S-BFIR based on different criteria, e.g., the closest backup S-BFIR.
 The PLR uses the egress protection mechanism of the tunneling protocol to reroute the packet to the backup S-BFIR.
 
+~~~~
+{::include ./drawings/ingress-protection-concept.txt}
+~~~~
+{: #fig-ingress-protection-concept title="Example subset with a backup S-BFIR."}
+
 The backup S-BFIR recognizes its role as backup ingress based on the tunneling protocol header.
-It removes the tunneling header and applies BIER-TE FRR with node protection.
+It removes the tunneling header and applies BIER-TE FRR {{!I-D.draft-eckert-bier-te-frr}} with node protection.
 This ensures that the packet is forwarded to the correct next hops of the failed S-BFIR.
 It also modifies the BIER-TE bitstring to prevent loops in the subset.
 After the backup S-BFIR processing, standard BIER-TE forwarding is applied.
 
-## Subset Tunneling Protection
-The tunnel between BFIR and S-BFIR may be protected using existing FRR 1:1 protection mechanisms.
-RSVP-TE with FRR {{?RFC8796}} can be used for MPLS and {{?I-D.draft-ietf-rtgwg-segment-routing-ti-lfa}} for FRR protection in SRv6.
+## Intra-Subset Protection
+Protection against failure inside a subset is achieved with existing BIER-TE FRR mechanisms.
+There are currently two drafts for BIER-TE FRR {{!I-D.draft-eckert-bier-te-frr}} and {{!I-D.draft-chen-bier-te-frr}}.
+Both define mechanisms for link and node protection and propose BIER-TE-in-BIER-TE tunneling to reroute packets around a failure.
+Therefore, either of these drafts may be used for the FRR protection mechanisms.
+
+
+
+
 
 # Examples
 In this section, we present two exemplary scenarios.

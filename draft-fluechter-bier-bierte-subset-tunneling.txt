@@ -89,9 +89,9 @@ Table of Contents
      2.3.  Subsets for BIER-TE with 1:1 Protection
    3.  Subset Tunneling
    4.  1:1 Protection
-     4.1.  Intra-Subset Protection
+     4.1.  Subset Tunneling Protection
      4.2.  Subset Ingress Protection
-     4.3.  Subset Tunneling Protection
+     4.3.  Intra-Subset Protection
    5.  Examples
      5.1.  Subset Tunneling
      5.2.  Ingress Protection with MPLS Tunneling
@@ -212,26 +212,36 @@ Table of Contents
    packet.  The BIER-TE bitstring contains the multicast tree from
    S-BFIR to the BFERs in the same subset.  Then, the BFIR adds an outer
    tunneling header that reaches one of the S-BFIRs of the destination
-   subset.  When an S-BFIR receives such a tunneled packet, it removes
-   the tunnel header and applies BIER-TE forwarding.  Used tunneling
-   protocols SHOULD support traffic engineering, e.g., MPLS TE or SRv6.
-   Further, they SHOULD support FRR and egress protection mechanisms for
-   1:1 protection.
+   subset.
+
+   |       MPLS Tunnel         |     BIER-TE Subset      |
+   |                           |                         |
+   BFIR ───A─── LSR ───B─── S-BFIR ───0─── BFR ───1─── BFER
+                                            |
+                                            2
+                                            |
+                                           BFR ───3─── BFER
+
+       Figure 1: Example BIER-TE network with a one-connected BIER-TE
+                      subset, S-BFIR, and MPLS tunnel.
+
+   When an S-BFIR receives such a tunneled packet, it removes the tunnel
+   header and applies BIER-TE forwarding.  Used tunneling protocols
+   SHOULD support traffic engineering, e.g., MPLS TE or SRv6.  Further,
+   they SHOULD support FRR and egress protection mechanisms for 1:1
+   protection.
 
 4.  1:1 Protection
 
    The protection of BIER-TE with subsets is split into three sections:
-   within the subset, at the subset ingress and during tunneling.
+   during tunneling, at the subset ingress, and within the subset.
 
-4.1.  Intra-Subset Protection
+4.1.  Subset Tunneling Protection
 
-   Protection against failure inside a subset is achieved with existing
-   BIER-TE FRR mechanisms.  There are currently two drafts for BIER-TE
-   FRR [I-D.draft-eckert-bier-te-frr] and [I-D.draft-chen-bier-te-frr].
-   Both define mechanisms for link and node protection and propose BIER-
-   TE-in-BIER-TE tunneling to reroute packets around a failure.
-   Therefore, either of these drafts may be used for the FRR protection
-   mechanisms.
+   The tunnel between BFIR and S-BFIR may be protected using existing
+   FRR 1:1 protection mechanisms.  RSVP-TE with FRR [RFC8796] can be
+   used for MPLS and [I-D.draft-ietf-rtgwg-segment-routing-ti-lfa] for
+   FRR protection in SRv6.
 
 4.2.  Subset Ingress Protection
 
@@ -250,20 +260,30 @@ Table of Contents
    protection mechanism of the tunneling protocol to reroute the packet
    to the backup S-BFIR.
 
+        / ───A─── S-BFIR ───0─── \
+       /         (Backup)         \
+      /                            \
+    LSR  ───B───  S-BFIR  ───1───  BFR ───2─── ...
+
+               Figure 2: Example subset with a backup S-BFIR.
+
    The backup S-BFIR recognizes its role as backup ingress based on the
    tunneling protocol header.  It removes the tunneling header and
-   applies BIER-TE FRR with node protection.  This ensures that the
-   packet is forwarded to the correct next hops of the failed S-BFIR.
-   It also modifies the BIER-TE bitstring to prevent loops in the
-   subset.  After the backup S-BFIR processing, standard BIER-TE
-   forwarding is applied.
+   applies BIER-TE FRR [I-D.draft-eckert-bier-te-frr] with node
+   protection.  This ensures that the packet is forwarded to the correct
+   next hops of the failed S-BFIR.  It also modifies the BIER-TE
+   bitstring to prevent loops in the subset.  After the backup S-BFIR
+   processing, standard BIER-TE forwarding is applied.
 
-4.3.  Subset Tunneling Protection
+4.3.  Intra-Subset Protection
 
-   The tunnel between BFIR and S-BFIR may be protected using existing
-   FRR 1:1 protection mechanisms.  RSVP-TE with FRR [RFC8796] can be
-   used for MPLS and [I-D.draft-ietf-rtgwg-segment-routing-ti-lfa] for
-   FRR protection in SRv6.
+   Protection against failure inside a subset is achieved with existing
+   BIER-TE FRR mechanisms.  There are currently two drafts for BIER-TE
+   FRR [I-D.draft-eckert-bier-te-frr] and [I-D.draft-chen-bier-te-frr].
+   Both define mechanisms for link and node protection and propose BIER-
+   TE-in-BIER-TE tunneling to reroute packets around a failure.
+   Therefore, either of these drafts may be used for the FRR protection
+   mechanisms.
 
 5.  Examples
 
@@ -273,7 +293,7 @@ Table of Contents
 5.1.  Subset Tunneling
 
    An example topology using BIER-TE subset tunneling is illustrated in
-   Figure 1.  The BFIR determines that the packet needs to be delivered
+   Figure 3.  The BFIR determines that the packet needs to be delivered
    to BFERs 1 and 2.  It recognizes that the two BFERs lie within two
    different subsets and clones the packet.  The first packet receives a
    BIER-TE header with the bits set for link 0 and BFER 1 and is
@@ -294,11 +314,11 @@ Table of Contents
                     |                         |     \
                    BFER 1                  BFER 2   BFER 3
 
-      Figure 1: Example BIER-TE network with two subsets and S-BFIRs.
+      Figure 3: Example BIER-TE network with two subsets and S-BFIRs.
 
 5.2.  Ingress Protection with MPLS Tunneling
 
-   Figure 2 illustrates the concept of ingress protection with MPLS.
+   Figure 4 illustrates the concept of ingress protection with MPLS.
    When the tunneled BIER-TE packet arrives at the LSR B, it detects
    that S-BFIR A failed.  Using MPLS egress protection, the PLR (LSR B)
    switches the label to the context label C' which indicates the backup
@@ -316,7 +336,7 @@ Table of Contents
    BFIR ───A─── LSR A ───B─── LSR B  ───C─── S-BFIR ───1─── BFR
                               (PLR)
 
-       Figure 2: Example BIER-TE network with a single subset and two
+       Figure 4: Example BIER-TE network with a single subset and two
                                   S-BFIRs.
 
 6.  Security Considerations
@@ -331,6 +351,20 @@ Table of Contents
 8.  References
 
 8.1.  Normative References
+
+   [I-D.draft-chen-bier-te-frr]
+              Chen, H., McBride, M., Liu, Y., Wang, A., Mishra, G. S.,
+              Fan, Y., Liu, L., and X. Liu, "BIER-TE Fast ReRoute", Work
+              in Progress, Internet-Draft, draft-chen-bier-te-frr-07, 28
+              March 2024, <https://datatracker.ietf.org/doc/html/draft-
+              chen-bier-te-frr-07>.
+
+   [I-D.draft-eckert-bier-te-frr]
+              Eckert, T. T., Cauchie, G., Braun, W., and M. Menth,
+              "Protection Methods for BIER-TE", Work in Progress,
+              Internet-Draft, draft-eckert-bier-te-frr-03, 5 March 2018,
+              <https://datatracker.ietf.org/doc/html/draft-eckert-bier-
+              te-frr-03>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -353,20 +387,6 @@ Table of Contents
               <https://www.rfc-editor.org/rfc/rfc9262>.
 
 8.2.  Informative References
-
-   [I-D.draft-chen-bier-te-frr]
-              Chen, H., McBride, M., Liu, Y., Wang, A., Mishra, G. S.,
-              Fan, Y., Liu, L., and X. Liu, "BIER-TE Fast ReRoute", Work
-              in Progress, Internet-Draft, draft-chen-bier-te-frr-07, 28
-              March 2024, <https://datatracker.ietf.org/doc/html/draft-
-              chen-bier-te-frr-07>.
-
-   [I-D.draft-eckert-bier-te-frr]
-              Eckert, T. T., Cauchie, G., Braun, W., and M. Menth,
-              "Protection Methods for BIER-TE", Work in Progress,
-              Internet-Draft, draft-eckert-bier-te-frr-03, 5 March 2018,
-              <https://datatracker.ietf.org/doc/html/draft-eckert-bier-
-              te-frr-03>.
 
    [I-D.draft-ietf-rtgwg-segment-routing-ti-lfa]
               Bashandy, A., Litkowski, S., Filsfils, C., Francois, P.,
