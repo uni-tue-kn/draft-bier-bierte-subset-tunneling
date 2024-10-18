@@ -58,9 +58,9 @@ The concept utilizes egress protection for reaching a subset when the ingress BF
 # Introduction
 
 Bit Index Explicit Replication with Traffic Engineering (BIER-TE) was introduced in {{!RFC9262}} as an alternative to BIER multicast, offering enhanced capabilities through traffic engineering, or "tree engineering" in this context.
-In BIER-TE, the forwarding of multicast traffic is guided by the BIER-TE header that includes bits representing Bit Forwarding Egress Routers (BFERs) and network links.
+In BIER-TE, the forwarding of multicast traffic is guided by the BIER-TE header that includes bits representing Bit Forwarding Egress Routers (BFERs) and links.
 As a result, the entire multicast distribution tree is encoded directly within the packet header.
-This encoding leads to scalability challenges, particularly in large network domains which are similar as in BIER.
+This encoding leads to scalability challenges, particularly in large networks, which are similar as in BIER.
 However, BIER-TE encodes more information in the bistring and thus scales worse than BIER for large networks.
 
 BIER-TE inherits the concept of subsets from BIER where the network domain can be partitioned into smaller segments.
@@ -156,7 +156,7 @@ The PLR uses the egress protection mechanism of the tunneling protocol to rerout
 ~~~~
 {::include ./drawings/ingress-protection-concept.txt}
 ~~~~
-{: #fig-ingress-protection-concept title="Example subset with a backup S-BFIR."}
+{: #fig-ingress-protection-concept title="MPLS example of a backup S-BFIR and a one-connected subset."}
 
 The backup S-BFIR recognizes its role as backup ingress based on the tunneling protocol header.
 It removes the tunneling header and applies BIER-TE FRR {{!I-D.draft-eckert-bier-te-frr}} with node protection.
@@ -165,14 +165,10 @@ It also modifies the BIER-TE bitstring to prevent loops in the subset.
 After the backup S-BFIR processing, standard BIER-TE forwarding is applied.
 
 ## Intra-Subset Protection
-Protection against failure inside a subset is achieved with existing BIER-TE FRR mechanisms.
+Protection against failures inside a subset is achieved with existing BIER-TE FRR mechanisms.
 There are currently two drafts for BIER-TE FRR {{!I-D.draft-eckert-bier-te-frr}} and {{!I-D.draft-chen-bier-te-frr}}.
 Both define mechanisms for link and node protection and propose BIER-TE-in-BIER-TE tunneling to reroute packets around a failure.
 Therefore, either of these drafts may be used for the FRR protection mechanisms.
-
-
-
-
 
 # Examples
 In this section, we present two exemplary scenarios.
@@ -183,7 +179,7 @@ An example topology using BIER-TE subset tunneling is illustrated in {{fig-subse
 The BFIR determines that the packet needs to be delivered to BFERs 1 and 2.
 It recognizes that the two BFERs lie within two different subsets and clones the packet.
 The first packet receives a BIER-TE header with the bits set for link 0 and BFER 1 and is tunneled to the S-BFIR of subset 1.
-The second packet recieves a BIER-TE header with the bits set for link 1 and BFER 2 and is tunneled to subset 2.
+The second packet receives a BIER-TE header with the bits set for link 1 and BFER 2 and is tunneled to subset 2.
 When the packet arrives at each S-BFIR, the S-BFIR removes the MPLS tunnel header.
 For subset 1, it then matches the BIER bitstring and forwards the packet over link 0.
 The S-BFIR of subset to forwards the packet over link 1.

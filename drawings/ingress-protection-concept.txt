@@ -1,4 +1,4 @@
-     / ───A─── S-BFIR ───0─── \
-    /         (Backup)         \
-   /                            \
- LSR  ───B───  S-BFIR  ───1───  BFR ───2─── ...
+                 / ───C─── S-BFIR ───0─── \     / ──3── BFER
+                /         (Backup)         \   /
+               /                            \ /
+BFIR ───A─── LSR  ───B───  S-BFIR  ───1───  BFR ───2─── BFER
