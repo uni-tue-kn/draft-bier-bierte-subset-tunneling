@@ -1178,13 +1178,13 @@ The concept utilizes egress protection for reaching a subset when the ingress BF
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-11-protection" class="internal xref">1:1 Protection</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-intra-subset-protection" class="internal xref">Intra-Subset Protection</a></p>
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-subset-tunneling-protection" class="internal xref">Subset Tunneling Protection</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
                 <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-subset-ingress-protection" class="internal xref">Subset Ingress Protection</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
-                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-subset-tunneling-protection" class="internal xref">Subset Tunneling Protection</a></p>
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-intra-subset-protection" class="internal xref">Intra-Subset Protection</a></p>
 </li>
             </ul>
 </li>
@@ -1344,10 +1344,27 @@ To that end, the BFIR forwarding logic has to be slightly modified from the one 
 When a BFIR receives an IPMC packet, it determines the destination BFERs and their subsets as with standard BIER-TE.
 The BFIR clones the packet for each subset and adds the corresponding BIER-TE header to each packet.
 The BIER-TE bitstring contains the multicast tree from S-BFIR to the BFERs in the same subset.
-Then, the BFIR adds an outer tunneling header that reaches one of the S-BFIRs of the destination subset.
-When an S-BFIR receives such a tunneled packet, it removes the tunnel header and applies BIER-TE forwarding.
+Then, the BFIR adds an outer tunneling header that reaches one of the S-BFIRs of the destination subset.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<span id="name-example-bier-te-network-wit"></span><div id="fig-subset-tunneling-concept">
+<figure id="figure-1">
+        <div class="alignLeft art-text artwork" id="section-3-2.1">
+<pre>
+|       MPLS Tunnel         |     BIER-TE Subset      |
+|                           |                         |
+BFIR ───A─── LSR ───B─── S-BFIR ───0─── BFR ───1─── BFER
+                                         |
+                                         2
+                                         |
+                                        BFR ───3─── BFER
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-example-bier-te-network-wit" class="selfRef">Example BIER-TE network with a one-connected BIER-TE subset, S-BFIR, and MPLS tunnel.</a>
+        </figcaption></figure>
+</div>
+<p id="section-3-3">When an S-BFIR receives such a tunneled packet, it removes the tunnel header and applies BIER-TE forwarding.
 Used tunneling protocols <span class="bcp14">SHOULD</span> support traffic engineering, e.g., MPLS TE or SRv6.
-Further, they <span class="bcp14">SHOULD</span> support FRR and egress protection mechanisms for 1:1 protection.<a href="#section-3-1" class="pilcrow">¶</a></p>
+Further, they <span class="bcp14">SHOULD</span> support FRR and egress protection mechanisms for 1:1 protection.<a href="#section-3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="protection">
@@ -1355,16 +1372,14 @@ Further, they <span class="bcp14">SHOULD</span> support FRR and egress protectio
       <h2 id="name-11-protection">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-11-protection" class="section-name selfRef">1:1 Protection</a>
       </h2>
-<p id="section-4-1">The protection of BIER-TE with subsets is split into three sections: within the subset, at the subset ingress and during tunneling.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<div id="intra-subset-protection">
+<p id="section-4-1">The protection of BIER-TE with subsets is split into three sections: during tunneling, at the subset ingress, and within the subset.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<div id="subset-tunneling-protection">
 <section id="section-4.1">
-        <h3 id="name-intra-subset-protection">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-intra-subset-protection" class="section-name selfRef">Intra-Subset Protection</a>
+        <h3 id="name-subset-tunneling-protection">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-subset-tunneling-protection" class="section-name selfRef">Subset Tunneling Protection</a>
         </h3>
-<p id="section-4.1-1">Protection against failure inside a subset is achieved with existing BIER-TE FRR mechanisms.
-There are currently two drafts for BIER-TE FRR <span>[<a href="#I-D.draft-eckert-bier-te-frr" class="cite xref">I-D.draft-eckert-bier-te-frr</a>]</span> and <span>[<a href="#I-D.draft-chen-bier-te-frr" class="cite xref">I-D.draft-chen-bier-te-frr</a>]</span>.
-Both define mechanisms for link and node protection and propose BIER-TE-in-BIER-TE tunneling to reroute packets around a failure.
-Therefore, either of these drafts may be used for the FRR protection mechanisms.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-1">The tunnel between BFIR and S-BFIR may be protected using existing FRR 1:1 protection mechanisms.
+RSVP-TE with FRR <span>[<a href="#RFC8796" class="cite xref">RFC8796</a>]</span> can be used for MPLS and <span>[<a href="#I-D.draft-ietf-rtgwg-segment-routing-ti-lfa" class="cite xref">I-D.draft-ietf-rtgwg-segment-routing-ti-lfa</a>]</span> for FRR protection in SRv6.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="subset-ingress-protection">
@@ -1380,20 +1395,36 @@ For SRv6 egress protection there is a similar draft <span>[<a href="#I-D.draft-i
 On a detected failure, the PLR determines a backup S-BFIR of the same subset.
 If there are multiple backup S-BFIR, the PLR may select a backup S-BFIR based on different criteria, e.g., the closest backup S-BFIR.
 The PLR uses the egress protection mechanism of the tunneling protocol to reroute the packet to the backup S-BFIR.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.2-3">The backup S-BFIR recognizes its role as backup ingress based on the tunneling protocol header.
-It removes the tunneling header and applies BIER-TE FRR with node protection.
+<span id="name-example-subset-with-a-backu"></span><div id="fig-ingress-protection-concept">
+<figure id="figure-2">
+          <div class="alignLeft art-text artwork" id="section-4.2-3.1">
+<pre>
+     / ───A─── S-BFIR ───0─── \
+    /         (Backup)         \
+   /                            \
+ LSR  ───B───  S-BFIR  ───1───  BFR ───2─── ...
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-example-subset-with-a-backu" class="selfRef">Example subset with a backup S-BFIR.</a>
+          </figcaption></figure>
+</div>
+<p id="section-4.2-4">The backup S-BFIR recognizes its role as backup ingress based on the tunneling protocol header.
+It removes the tunneling header and applies BIER-TE FRR <span>[<a href="#I-D.draft-eckert-bier-te-frr" class="cite xref">I-D.draft-eckert-bier-te-frr</a>]</span> with node protection.
 This ensures that the packet is forwarded to the correct next hops of the failed S-BFIR.
 It also modifies the BIER-TE bitstring to prevent loops in the subset.
-After the backup S-BFIR processing, standard BIER-TE forwarding is applied.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+After the backup S-BFIR processing, standard BIER-TE forwarding is applied.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="subset-tunneling-protection">
+<div id="intra-subset-protection">
 <section id="section-4.3">
-        <h3 id="name-subset-tunneling-protection">
-<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-subset-tunneling-protection" class="section-name selfRef">Subset Tunneling Protection</a>
+        <h3 id="name-intra-subset-protection">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-intra-subset-protection" class="section-name selfRef">Intra-Subset Protection</a>
         </h3>
-<p id="section-4.3-1">The tunnel between BFIR and S-BFIR may be protected using existing FRR 1:1 protection mechanisms.
-RSVP-TE with FRR <span>[<a href="#RFC8796" class="cite xref">RFC8796</a>]</span> can be used for MPLS and <span>[<a href="#I-D.draft-ietf-rtgwg-segment-routing-ti-lfa" class="cite xref">I-D.draft-ietf-rtgwg-segment-routing-ti-lfa</a>]</span> for FRR protection in SRv6.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-1">Protection against failure inside a subset is achieved with existing BIER-TE FRR mechanisms.
+There are currently two drafts for BIER-TE FRR <span>[<a href="#I-D.draft-eckert-bier-te-frr" class="cite xref">I-D.draft-eckert-bier-te-frr</a>]</span> and <span>[<a href="#I-D.draft-chen-bier-te-frr" class="cite xref">I-D.draft-chen-bier-te-frr</a>]</span>.
+Both define mechanisms for link and node protection and propose BIER-TE-in-BIER-TE tunneling to reroute packets around a failure.
+Therefore, either of these drafts may be used for the FRR protection mechanisms.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1410,7 +1441,7 @@ One for the subset tunneling and one for the ingress protection mechanism.<a hre
         <h3 id="name-subset-tunneling-2">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-subset-tunneling-2" class="section-name selfRef">Subset Tunneling</a>
         </h3>
-<p id="section-5.1-1">An example topology using BIER-TE subset tunneling is illustrated in <a href="#fig-subset-tunneling" class="auto internal xref">Figure 1</a>.
+<p id="section-5.1-1">An example topology using BIER-TE subset tunneling is illustrated in <a href="#fig-subset-tunneling" class="auto internal xref">Figure 3</a>.
 The BFIR determines that the packet needs to be delivered to BFERs 1 and 2.
 It recognizes that the two BFERs lie within two different subsets and clones the packet.
 The first packet receives a BIER-TE header with the bits set for link 0 and BFER 1 and is tunneled to the S-BFIR of subset 1.
@@ -1418,8 +1449,8 @@ The second packet recieves a BIER-TE header with the bits set for link 1 and BFE
 When the packet arrives at each S-BFIR, the S-BFIR removes the MPLS tunnel header.
 For subset 1, it then matches the BIER bitstring and forwards the packet over link 0.
 The S-BFIR of subset to forwards the packet over link 1.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<span id="name-example-bier-te-network-wit"></span><div id="fig-subset-tunneling">
-<figure id="figure-1">
+<span id="name-example-bier-te-network-with"></span><div id="fig-subset-tunneling">
+<figure id="figure-3">
           <div class="alignLeft art-text artwork" id="section-5.1-2.1">
 <pre>
                             BFIR
@@ -1433,8 +1464,8 @@ The S-BFIR of subset to forwards the packet over link 1.<a href="#section-5.1-1"
                 BFER 1                  BFER 2   BFER 3
 </pre>
 </div>
-<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
-<a href="#name-example-bier-te-network-wit" class="selfRef">Example BIER-TE network with two subsets and S-BFIRs.</a>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-example-bier-te-network-with" class="selfRef">Example BIER-TE network with two subsets and S-BFIRs.</a>
           </figcaption></figure>
 </div>
 </section>
@@ -1444,27 +1475,27 @@ The S-BFIR of subset to forwards the packet over link 1.<a href="#section-5.1-1"
         <h3 id="name-ingress-protection-with-mpl">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-ingress-protection-with-mpl" class="section-name selfRef">Ingress Protection with MPLS Tunneling</a>
         </h3>
-<p id="section-5.2-1"><a href="#fig-ingress-protetion" class="auto internal xref">Figure 2</a> illustrates the concept of ingress protection with MPLS.
+<p id="section-5.2-1"><a href="#fig-ingress-protetion" class="auto internal xref">Figure 4</a> illustrates the concept of ingress protection with MPLS.
 When the tunneled BIER-TE packet arrives at the LSR B, it detects that S-BFIR A failed.
 Using MPLS egress protection, the PLR (LSR B) switches the label to the context label C' which indicates the backup path to S-BFIR'.
 S-BFIR' recognizes its role as protector by matching the context label to the failed ingress node.
 Then, it applies the BIER-TE FRR node protection handling, unsets the bit for link 1 and sets the bit for link 0.
 This way, the packet reaches the BFR and can be forwarded with standard BIER-TE.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<span id="name-example-bier-te-network-with"></span><div id="fig-ingress-protetion">
-<figure id="figure-2">
+<span id="name-example-bier-te-network-with-"></span><div id="fig-ingress-protetion">
+<figure id="figure-4">
           <div class="alignLeft art-text artwork" id="section-5.2-2.1">
 <pre>
 |                    BIER-TE domain                            |
                                         | BIER-TE subset (SI:1)|
                                /--C'-- S-BFIR' -- 0 -- \
-                              /                          \
-                             /                            \
+                              /                         \
+                             /                           \
 BFIR ───A─── LSR A ───B─── LSR B  ───C─── S-BFIR ───1─── BFR
                            (PLR)
 </pre>
 </div>
-<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
-<a href="#name-example-bier-te-network-with" class="selfRef">Example BIER-TE network with a single subset and two S-BFIRs.</a>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-example-bier-te-network-with-" class="selfRef">Example BIER-TE network with a single subset and two S-BFIRs.</a>
           </figcaption></figure>
 </div>
 </section>
@@ -1498,6 +1529,14 @@ BFIR ───A─── LSR A ───B─── LSR B  ───C─── S-
 <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
+<dt id="I-D.draft-chen-bier-te-frr">[I-D.draft-chen-bier-te-frr]</dt>
+        <dd>
+<span class="refAuthor">Chen, H.</span>, <span class="refAuthor">McBride, M.</span>, <span class="refAuthor">Liu, Y.</span>, <span class="refAuthor">Wang, A.</span>, <span class="refAuthor">Mishra, G. S.</span>, <span class="refAuthor">Fan, Y.</span>, <span class="refAuthor">Liu, L.</span>, and <span class="refAuthor">X. Liu</span>, <span class="refTitle">"BIER-TE Fast ReRoute"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-chen-bier-te-frr-07</span>, <time datetime="2024-03-28" class="refDate">28 March 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-chen-bier-te-frr-07">https://datatracker.ietf.org/doc/html/draft-chen-bier-te-frr-07</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.draft-eckert-bier-te-frr">[I-D.draft-eckert-bier-te-frr]</dt>
+        <dd>
+<span class="refAuthor">Eckert, T. T.</span>, <span class="refAuthor">Cauchie, G.</span>, <span class="refAuthor">Braun, W.</span>, and <span class="refAuthor">M. Menth</span>, <span class="refTitle">"Protection Methods for BIER-TE"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-eckert-bier-te-frr-03</span>, <time datetime="2018-03-05" class="refDate">5 March 2018</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-eckert-bier-te-frr-03">https://datatracker.ietf.org/doc/html/draft-eckert-bier-te-frr-03</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
@@ -1523,14 +1562,6 @@ BFIR ───A─── LSR A ───B─── LSR B  ───C─── S-
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
-<dt id="I-D.draft-chen-bier-te-frr">[I-D.draft-chen-bier-te-frr]</dt>
-        <dd>
-<span class="refAuthor">Chen, H.</span>, <span class="refAuthor">McBride, M.</span>, <span class="refAuthor">Liu, Y.</span>, <span class="refAuthor">Wang, A.</span>, <span class="refAuthor">Mishra, G. S.</span>, <span class="refAuthor">Fan, Y.</span>, <span class="refAuthor">Liu, L.</span>, and <span class="refAuthor">X. Liu</span>, <span class="refTitle">"BIER-TE Fast ReRoute"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-chen-bier-te-frr-07</span>, <time datetime="2024-03-28" class="refDate">28 March 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-chen-bier-te-frr-07">https://datatracker.ietf.org/doc/html/draft-chen-bier-te-frr-07</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="I-D.draft-eckert-bier-te-frr">[I-D.draft-eckert-bier-te-frr]</dt>
-        <dd>
-<span class="refAuthor">Eckert, T. T.</span>, <span class="refAuthor">Cauchie, G.</span>, <span class="refAuthor">Braun, W.</span>, and <span class="refAuthor">M. Menth</span>, <span class="refTitle">"Protection Methods for BIER-TE"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-eckert-bier-te-frr-03</span>, <time datetime="2018-03-05" class="refDate">5 March 2018</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-eckert-bier-te-frr-03">https://datatracker.ietf.org/doc/html/draft-eckert-bier-te-frr-03</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="I-D.draft-ietf-rtgwg-segment-routing-ti-lfa">[I-D.draft-ietf-rtgwg-segment-routing-ti-lfa]</dt>
         <dd>
 <span class="refAuthor">Bashandy, A.</span>, <span class="refAuthor">Litkowski, S.</span>, <span class="refAuthor">Filsfils, C.</span>, <span class="refAuthor">Francois, P.</span>, <span class="refAuthor">Decraene, B.</span>, and <span class="refAuthor">D. Voyer</span>, <span class="refTitle">"Topology Independent Fast Reroute using Segment Routing"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rtgwg-segment-routing-ti-lfa-17</span>, <time datetime="2024-07-05" class="refDate">5 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rtgwg-segment-routing-ti-lfa-17">https://datatracker.ietf.org/doc/html/draft-ietf-rtgwg-segment-routing-ti-lfa-17</a>&gt;</span>. </dd>
