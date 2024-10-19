@@ -88,7 +88,7 @@ Further abbreviations used in this document:
 {: #table_abbrev title="Abbreviations."}
 
 # BIER-TE Subsets
-BIER subsets can be constructed by selecting a number of arbitrary BFERs within the BIER domain. The number of BFERs of each subset must not exceed the bitstring length and the BFERs of all subsets should cover all BFERs of the entire domain. This rather unconstraint selection of BFERs works well beause a packet sent by a BIER BFIR reaches any BFER over the routing underlay, no matter which subset the BFER belongs to.
+BIER subsets can be constructed by selecting a number of arbitrary BFERs within the BIER domain. The number of BFERs of each subset must not exceed the bitstring length and the BFERs of all subsets should cover all BFERs of the entire domain. This rather unconstraint selection of BFERs works well because a packet sent by a BIER BFIR reaches any BFER over the routing underlay, no matter which subset the BFER belongs to.
 
 In contrast, with BIER-TE, a BFER can be reached over a path that is encoded in the bitstring. Therefore, also links need to be part of the subset. Moreover, within a very large ring or a line, a BFIR may be so far away from a BFER that the links of the subset do not suffice to define a path from the BFIR to that BFER.
 
