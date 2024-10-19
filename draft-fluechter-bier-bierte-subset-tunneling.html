@@ -1035,7 +1035,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Flüchter, et al.</td>
-<td class="center">Expires 21 April 2025</td>
+<td class="center">Expires 22 April 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1048,12 +1048,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-fluechter-bier-bierte-subset-tunneling-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-10-18" class="published">18 October 2024</time>
+<time datetime="2024-10-19" class="published">19 October 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-04-21">21 April 2025</time></dd>
+<dd class="expires"><time datetime="2025-04-22">22 April 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1115,7 +1115,7 @@ The concept utilizes egress protection for reaching a subset when the ingress BF
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 April 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 April 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1159,17 +1159,6 @@ The concept utilizes egress protection for reaching a subset when the ingress BF
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
             <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-bier-te-subsets" class="internal xref">BIER-TE Subsets</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
-                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-need-for-bier-te-subsets" class="internal xref">Need for BIER-TE Subsets</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
-                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-subsets-for-bier-te" class="internal xref">Subsets for BIER-TE</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
-                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="auto internal xref">2.3</a>.  <a href="#name-subsets-for-bier-te-with-11" class="internal xref">Subsets for BIER-TE with 1:1 Protection</a></p>
-</li>
-            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-subset-tunneling" class="internal xref">Subset Tunneling</a></p>
@@ -1290,48 +1279,12 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
       <h2 id="name-bier-te-subsets">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-bier-te-subsets" class="section-name selfRef">BIER-TE Subsets</a>
       </h2>
-<p id="section-2-1">In this section, limitations of the current BIER-TE subset definition are described.
-Based on these shortcomings, a new BIER-TE subset concept is proposed.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<div id="need-for-bier-te-subsets">
-<section id="section-2.1">
-        <h3 id="name-need-for-bier-te-subsets">
-<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-need-for-bier-te-subsets" class="section-name selfRef">Need for BIER-TE Subsets</a>
-        </h3>
-<p id="section-2.1-1">BIER subsets can be constructed by arbitrarily selecting BFERs in the domain.
-The BIER BFIR can always reach any BFER, no matter which subset they are located in.
-This does not hold for BIER-TE subsets as the BIER-TE header also encodes the links to traverse in the bitstring.
-Therefore, the BFERs in a subset have to be sufficiently connected by links in the same subset.
-BFIRs that are not part of such a subset cannot send packets to the BFERs in the subset directly.
-Rather, they have to tunnel packets to a BFR in the subset which then applies BIER-TE forwarding again.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="subsets-for-bier-te">
-<section id="section-2.2">
-        <h3 id="name-subsets-for-bier-te">
-<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-subsets-for-bier-te" class="section-name selfRef">Subsets for BIER-TE</a>
-        </h3>
-<p id="section-2.2-1">The following constraints <span class="bcp14">MUST</span> be fullfilled by BIER-TE subsets.
-A BIER-TE subset <span class="bcp14">MUST</span> be at least one-connected, i.e., there has to be at least one path from any BFR to any BFER in the subset.
-Further, the combined number of BFERs and links in a subset <span class="bcp14">MUST NOT</span> be larger than the maximum supported BitStringLength.
-There is also the posbility that a one-connected domain does not contain suitable one-connected subsets.
-To solve this, tunnels can be assigned as virtual links in the subset.
-These tunnels leverage the routing layer and may forward the packet over links that are not in the subset.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
-<p id="section-2.2-2">Every BFR that can reach any BFER in a subset over links of the subset is considered a part of the subset.
-These BFRs may serve as ingress nodes for the subset and tunneling endpoints to deliver packets to the BFERs of a subset.
-BFRs that receive tunneled packets from a BFIR are referred to as Subset BFIRs (S-BFIR).<a href="#section-2.2-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="subsets-for-bier-te-with-11-protection">
-<section id="section-2.3">
-        <h3 id="name-subsets-for-bier-te-with-11">
-<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-subsets-for-bier-te-with-11" class="section-name selfRef">Subsets for BIER-TE with 1:1 Protection</a>
-        </h3>
-<p id="section-2.3-1">Subsets for BIER-TE with 1:1 protection have to be at least two-connected, i.e., there have to be at least two paths from any BFR to any BFER in the subset.
-When a link or node failes, the remaining subset is still one-connected.
-Further, for every S-BFIR in the subset, one or more backup S-BFIRs have to be assigned.
-When an S-BFIR fails, the backup S-BFIRs serve as alternative ingress to the subset and ensure that the packets reach the BFERs.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
-</section>
-</div>
+<p id="section-2-1">BIER subsets can be constructed by selecting a number of arbitrary BFERs within the BIER domain. The number of BFERs of each subset must not exceed the bitstring length and the BFERs of all subsets should cover all BFERs of the entire domain. This rather unconstraint selection of BFERs works well beause a packet sent by a BIER BFIR reaches any BFER over the routing underlay, no matter which subset the BFER belongs to.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">In contrast, with BIER-TE, a BFER can be reached over a path that is encoded in the bitstring. Therefore, also links need to be part of the subset. Moreover, within a very large ring or a line, a BFIR may be so far away from a BFER that the links of the subset do not suffice to define a path from the BFIR to that BFER.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-3">Therefore, a different approach is needed for subsets in BIER-TE. First, a subset also needs links in additions to BFERs which are encoded in the bitstring. The number of BFERs and links within the subset <span class="bcp14">MUST NOT</span> exceed the size of the bitstring. Moreover, links and BFERs need to be connected so that a BIER-TE packet at a source of any link in the subset can reach all BFERs within the subset. The BFRs belonging to the links are also part of the subset but are not represented by a bit in the bitstring unless they constitute BFERs. Thus, a subset needs to be one-connected. That is, the mentioned property is fulfilled unless one link or BFR fails.
+A BFIR may need to send a packet to a specific BFER, but it may not be part of the subset the BFER belongs to. Then, the packet cannot be carried via plain BIER-TE from the BFIR to the BFER. Therefore, the BFIR tunnels the BIER-TE packet to some BFR within the subset. That BFR is denoted as S-BFIR (subset BFIR). There may be one or many S-BFIRs for a subset.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4">Subsets for BIER-TE with 1:1 protection have to be at least two-connected, i.e., the remaining subset is one-connected if a link or BFR fails. That is, in case of a failure, there is still a path from any BFR to any BFER within the subset. Further, for every S-BFIR in the subset, one or more backup S-BFIRs have to be assigned. When an S-BFIR fails, the backup S-BFIRs serve as alternative ingress to the subset and ensure that the packets reach the BFERs.¶<a href="#section-2-4" class="pilcrow">¶</a></p>
+<p id="section-2-5">A domain may be one- or two connected, but it may be difficult or even impossible to find a desired number of subsets with that property. Then, virtual links may be defined as tunnels whose paths extend over links outside the subset.<a href="#section-2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="subset-tunneling">
