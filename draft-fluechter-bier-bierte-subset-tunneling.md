@@ -88,34 +88,17 @@ Further abbreviations used in this document:
 {: #table_abbrev title="Abbreviations."}
 
 # BIER-TE Subsets
-In this section, limitations of the current BIER-TE subset definition are described.
-Based on these shortcomings, a new BIER-TE subset concept is proposed.
+BIER subsets can be constructed by selecting a number of arbitrary BFERs within the BIER domain. The number of BFERs of each subset must not exceed the bitstring length and the BFERs of all subsets should cover all BFERs of the entire domain. This rather unconstraint selection of BFERs works well beause a packet sent by a BIER BFIR reaches any BFER over the routing underlay, no matter which subset the BFER belongs to.
 
-## Need for BIER-TE Subsets
-BIER subsets can be constructed by arbitrarily selecting BFERs in the domain.
-The BIER BFIR can always reach any BFER, no matter which subset they are located in.
-This does not hold for BIER-TE subsets as the BIER-TE header also encodes the links to traverse in the bitstring.
-Therefore, the BFERs in a subset have to be sufficiently connected by links in the same subset.
-BFIRs that are not part of such a subset cannot send packets to the BFERs in the subset directly.
-Rather, they have to tunnel packets to a BFR in the subset which then applies BIER-TE forwarding again.
+In contrast, with BIER-TE, a BFER can be reached over a path that is encoded in the bitstring. Therefore, also links need to be part of the subset. Moreover, within a very large ring or a line, a BFIR may be so far away from a BFER that the links of the subset do not suffice to define a path from the BFIR to that BFER.
 
-## Subsets for BIER-TE
-The following constraints MUST be fullfilled by BIER-TE subsets.
-A BIER-TE subset MUST be at least one-connected, i.e., there has to be at least one path from any BFR to any BFER in the subset.
-Further, the combined number of BFERs and links in a subset MUST NOT be larger than the maximum supported BitStringLength.
-There is also the posbility that a one-connected domain does not contain suitable one-connected subsets.
-To solve this, tunnels can be assigned as virtual links in the subset.
-These tunnels leverage the routing layer and may forward the packet over links that are not in the subset.
+Therefore, a different approach is needed for subsets in BIER-TE. First, a subset also needs links in additions to BFERs which are encoded in the bitstring. The number of BFERs and links within the subset MUST NOT exceed the size of the bitstring. Moreover, links and BFERs need to be connected so that a BIER-TE packet at a source of any link in the subset can reach all BFERs within the subset. The BFRs belonging to the links are also part of the subset but are not represented by a bit in the bitstring unless they constitute BFERs. Thus, a subset needs to be one-connected. That is, the mentioned property is fulfilled unless one link or BFR fails.
+A BFIR may need to send a packet to a specific BFER, but it may not be part of the subset the BFER belongs to. Then, the packet cannot be carried via plain BIER-TE from the BFIR to the BFER. Therefore, the BFIR tunnels the BIER-TE packet to some BFR within the subset. That BFR is denoted as S-BFIR (subset BFIR). There may be one or many S-BFIRs for a subset.
 
-Every BFR that can reach any BFER in a subset over links of the subset is considered a part of the subset.
-These BFRs may serve as ingress nodes for the subset and tunneling endpoints to deliver packets to the BFERs of a subset.
-BFRs that receive tunneled packets from a BFIR are referred to as Subset BFIRs (S-BFIR).
+Subsets for BIER-TE with 1:1 protection have to be at least two-connected, i.e., the remaining subset is one-connected if a link or BFR fails. That is, in case of a failure, there is still a path from any BFR to any BFER within the subset. Further, for every S-BFIR in the subset, one or more backup S-BFIRs have to be assigned. When an S-BFIR fails, the backup S-BFIRs serve as alternative ingress to the subset and ensure that the packets reach the BFERs.¶
 
-## Subsets for BIER-TE with 1:1 Protection
-Subsets for BIER-TE with 1:1 protection have to be at least two-connected, i.e., there have to be at least two paths from any BFR to any BFER in the subset.
-When a link or node failes, the remaining subset is still one-connected.
-Further, for every S-BFIR in the subset, one or more backup S-BFIRs have to be assigned.
-When an S-BFIR fails, the backup S-BFIRs serve as alternative ingress to the subset and ensure that the packets reach the BFERs.
+A domain may be one- or two connected, but it may be difficult or even impossible to find a desired number of subsets with that property. Then, virtual links may be defined as tunnels whose paths extend over links outside the subset.
+
 
 # Subset Tunneling
 The BFIR reaches each subset by tunneling packets to any S-BFIR in the subset.
