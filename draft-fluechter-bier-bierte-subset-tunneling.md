@@ -48,7 +48,7 @@ informative:
 --- abstract
 
 BIER-TE extends BIER with tree engineering capabilities and can be supported by almost the same hardware.
-However, a bitstring in BIER-TE hold bits for BFERs and links, which effects that the size of supportable networks in terms of BFERs is smaller for BIER-TE than for BIER.
+However, a bitstring in BIER-TE hold bits for BFERs and links, which effects that the size of supportable topologies in terms of BFERs is smaller for BIER-TE than for BIER.
 While for BIER, subsets can be utilized to improve scaling to large multicast domains, this mechanism requires adaptation for BIER-TE.
 In this document, requirements for BIER-TE subsets are defined, a mechanism is described for how BIER-TE packets can reach their subsets using tunneling, and 1:1 protection for the entire BIER-TE multicast tree is explained.
 The concept utilizes egress protection for reaching a subset when the ingress BFIR of the subset fails.
@@ -57,13 +57,13 @@ The concept utilizes egress protection for reaching a subset when the ingress BF
 
 # Introduction
 
-Bit Index Explicit Replication with Traffic Engineering (BIER-TE) was introduced in {{!RFC9262}} as an alternative to BIER multicast, offering enhanced capabilities through traffic engineering, or "tree engineering" in this context.
-In BIER-TE, the forwarding of multicast traffic is guided by the BIER-TE header that includes bits representing Bit Forwarding Egress Routers (BFERs) and links.
+Bit Index Explicit Replication with Traffic Engineering (BIER-TE) was introduced in {{!RFC9262}} as an extension to the BIER archtecture, offering enhanced capabilities through traffic engineering, or "tree engineering" in this context.
+In BIER-TE, the forwarding and replication of multicast traffic is guided by the BIER-TE header that includes bits representing Bit Forwarding Egress Routers (BFERs) and links.
 As a result, the entire multicast distribution tree is encoded directly within the packet header.
 This encoding leads to scalability challenges, particularly in large networks, which are similar as in BIER.
 However, BIER-TE encodes more information in the bistring and thus scales worse than BIER for large networks.
 
-BIER-TE inherits the concept of subsets from BIER where the network domain can be partitioned into smaller segments.
+BIER-TE inherits the concept of subsets from BIER where the network domain can be partitioned into smaller sub-topologies.
 A BIER-TE subset is a partition of the BIER-TE domain with a unique Set Identifier (SI).
 The SI containing the destination BFERs of a packet is indicated in the BIER-TE header as a bitstring.
 Further, the bitstring addresses only links and BFERs in that subset.
@@ -93,15 +93,15 @@ BIER subsets can be constructed by selecting a number of arbitrary BFERs within 
 In contrast, with BIER-TE, a BFER can be reached over a path that is encoded in the bitstring. Therefore, also links need to be part of the subset. Moreover, within a very large ring or a line, a BFIR may be so far away from a BFER that the links of the subset do not suffice to define a path from the BFIR to that BFER.
 
 Therefore, a different approach is needed for subsets in BIER-TE. First, a subset also needs links in additions to BFERs which are encoded in the bitstring. The number of BFERs and links within the subset MUST NOT exceed the size of the bitstring. Moreover, links and BFERs need to be connected so that a BIER-TE packet at a source of any link in the subset can reach all BFERs within the subset. The BFRs belonging to the links are also part of the subset but are not represented by a bit in the bitstring unless they constitute BFERs. Thus, a subset needs to be one-connected. That is, the mentioned property is fulfilled unless one link or BFR fails.
-A BFIR may need to send a packet to a specific BFER, but it may not be part of the subset the BFER belongs to. Then, the packet cannot be carried via plain BIER-TE from the BFIR to the BFER. Therefore, the BFIR tunnels the BIER-TE packet to some BFR within the subset. That BFR is denoted as S-BFIR (subset BFIR). There may be one or many S-BFIRs for a subset.
+A BFIR may need to send a packet to a specific BFER, but it does not need to be part of the subset the BFER belongs to. It can however use unicast tunneling to direct packets to some BFR within the subset. That BFR is denoted as S-BFIR (subset BFIR). There may be one or many S-BFIRs for a subset.
 
-Subsets for BIER-TE with 1:1 protection have to be at least two-connected, i.e., the remaining subset is one-connected if a link or BFR fails. That is, in case of a failure, there is still a path from any BFR to any BFER within the subset. Further, for every S-BFIR in the subset, one or more backup S-BFIRs have to be assigned. When an S-BFIR fails, the backup S-BFIRs serve as alternative ingress to the subset and ensure that the packets reach the BFERs.¶
+Subsets for BIER-TE with 1:1 protection have to be at least two-connected, i.e., the remaining subset is one-connected if a link or BFR fails. That is, in case of a failure, there is still a path from any BFR to any BFER within the subset. Further, for every S-BFIR in the subset, one or more backup S-BFIRs have to be assigned. When an S-BFIR fails, the backup S-BFIRs serve as alternative ingress to the subset and ensure that the packets reach the BFERs.
 
 A domain may be one- or two connected, but it may be difficult or even impossible to find a desired number of subsets with that property. Then, virtual links may be defined as tunnels whose paths extend over links outside the subset.
 
 
 # Subset Tunneling
-The BFIR reaches each subset by tunneling packets to any S-BFIR in the subset.
+Any BFIR reaches each subset by tunneling packets to any S-BFIR in the subset.
 To that end, the BFIR forwarding logic has to be slightly modified from the one defined in {{!RFC8279}}.
 When a BFIR receives an IPMC packet, it determines the destination BFERs and their subsets as with standard BIER-TE.
 The BFIR clones the packet for each subset and adds the corresponding BIER-TE header to each packet.
@@ -114,7 +114,7 @@ Then, the BFIR adds an outer tunneling header that reaches one of the S-BFIRs of
 {: #fig-subset-tunneling-concept title="Example BIER-TE network with a one-connected BIER-TE subset, S-BFIR, and MPLS tunnel."}
 
 When an S-BFIR receives such a tunneled packet, it removes the tunnel header and applies BIER-TE forwarding.
-Used tunneling protocols SHOULD support traffic engineering, e.g., MPLS TE or SRv6.
+The tunneling protocols used SHOULD support path steering, e.g., MPLS TE or SRv6.
 Further, they SHOULD support FRR and egress protection mechanisms for 1:1 protection.
 
 
