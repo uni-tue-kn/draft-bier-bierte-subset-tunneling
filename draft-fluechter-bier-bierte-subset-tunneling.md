@@ -1,7 +1,7 @@
 ---
 title: "Extensions to BIER Tree Engineering (BIER-TE) for Large Multicast Domains and 1:1 Protection"
-abbrev: "bierte-subset-extensions"
-category: info
+abbrev: "bierte-subset-tunneling"
+category: std
 
 docname: draft-fluechter-bier-bierte-subset-tunneling-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
